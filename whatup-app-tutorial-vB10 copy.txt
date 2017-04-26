@@ -1,0 +1,768 @@
+whatup app
+
+I. SETUP POSTGRES LOCALLY
+
+Log into Postgres:
+sudo su - postgres  ## this means that you are logging in as the default superuser named "postgres"
+(terminal prompt should change)
+		- su: unknown login: postgres
+Log into Postgres console:
+psql
+(terminal prompt should change again)
+		- psql: FATAL:  database "elizakhachatryan" does not exist
+				———————
+
+				psql: Logs me in with my default username
+
+				psql -U postgres: Logs me in as the postgres user
+					- psql (9.6.2)
+					Type "help" for help.
+
+					postgres=# 
+
+				Sudo doesn't seem to be required for me.
+
+
+				———————
+
+http://stackoverflow.com/questions/19953653/how-to-set-up-postgres-database-for-local-rails-project
+3 steps (create user, create 2 db, test that dbs work locally and on heroku)
+1. create a Role/User (aka a User) in Postgres
+CREATE USER whatup WITH PASSWORD 'password';
+	- (to make it easier) make sure the user's name (ie, "whatup" in this example)
+		is the same as the name of the Rails app you want to generate later.
+		IE, later you are going to now do "rails new whatup --database=postgresql"
+	- Don't forget the ; or the Postgres command won't take,
+		you should get terminal feedback if it worked.
+	
+
+Open a Terminal and do sudo su postgres. Now, after entering your admin password, you are able to launch psql and do
+
+CREATE USER yourname WITH SUPERUSER PASSWORD 'yourpassword';
+
+
+1b.elevate that new User's permissions
+ALTER USER whatup SUPERUSER;
+	- you could grant different permissions here,
+		for example: ALTER USER whatup SUPERUSER CREATEROLE CREATEDB REPLICATION;
+*1c. extra: can update password if nessesary
+		ALTER USER whatup WITH PASSWORD 'password';
+
+2. Create 2 databases
+CREATE DATABASE whatup_development;
+CREATE DATABASE whatup_test;
+
+2b. Give permissions to the user on the databases
+GRANT ALL PRIVILEGES ON DATABASE whatup_development TO whatup;
+GRANT ALL PRIVILEGES ON DATABASE whatup_test TO whatup;
+
+2c. while your at it, make the User the Owner of the db (not really nessesary, but make sense)
+ALTER DATABASE whatup_development OWNER TO whatup;
+ALTER DATABASE whatup_test OWNER TO whatup;
+
+end Postgres session
+ \q
+get out of Postgres prompt
+exit
+			—————————
+			also added etsydemo_production
+
+			configure pg on existing app
+
+			http://stackoverflow.com/questions/7706866/converting-a-ruby-on-rails-app-from-sqlite-to-postgresql
+			i mean.. setting up PG is a lenghty process, but I'm thinking that converting your rails app is relatively simple once you 			have pg running
+
+			http://railscasts.com/episodes/342-migrating-to-postgresql?autoplay=true
+			
+			pg gem and bundle install
+
+			changed database.yml
+			
+			rake db:migrate
+
+			check if pg is running
+			rails db
+			select * from listings;
+
+			push to heroku
+
+			heroku run rake db:migrate
+
+			heroku pg:psql
+
+rake db:create:all (rake db:create:all creates all the databases for the application (which are defined in database.yml))
+if you want taps to export from one database to another
+gem install taps
+taps server
+			—————————
+II. Rails app time! 
+1. Create a new rails app, specifying your database
+rails new whatup --database=postgresql
+
+change into new app directory [cd whatup],
+launch server in another terminal window [rails s],
+see test page in browser
+
+---
+Create first static page, update route to test, push to Heroku.
+
+rails g controller StaticPages welcome
+
+in config/routes.rb
+  root 'static_pages#welcome'
+  match '/welcome', to: 'static_pages#welcome', via: 'get'
+
+heroku create whatupone ##create app on heroku and give it a name (whatup was taken)
+https://whatupone.herokuapp.com/
+
+	push to heroku
+
+	Great! Now we know heroku is working (but not db yet)
+		...know we can push to Heroku, and get a static page up, that's it.
+---
+
+2a. Update/Make sure config/database.yml is correct
+	(the --database=postgresql flag should have done this, but still)
+2b. Update your gemfile
+	(this should be working, but still, add all your gems)
+		((bunch of gems, good to specify ruby version))
+	bundle install [[bundle update too?]]
+
+III. Use the db to see that it works locally, then on Heroku
+1. use first resource/generate first scaffold (this necessitates the use of the db)
+rails g scaffold Article title:string body:text
+run migration
+[bundle exec] rake db:migrate
+	Add data in browser/Works Locally in browser.
+	View data locally in pgAdmin.
+	DATABASE WORKING LOCALLY!
+---
+nice to add some nav links, from welcome to Articles index, in application.html.erb
+---
+2. push to heroku
+	heroku run rake db:migrate
+	DATABASE WORKING on HEROKU!!!
+
+---
+Create first git tag:
+git tag -a t1-PostgresWorking -m "Postgres working both locally and on Heroku."
+---
+
+IV. INSTALL/USE BOOTSTRAP
+http://www.gotealeaf.com/blog/integrating-rails-and-bootstrap-part-1
+1. install
+gemfile (if not there already)
+gem 'bootstrap-sass', '~> 3.2.0'
+gem 'autoprefixer-rails'
+	bundle install
+
+rename app/assets/stylesheets/application.css to app/assets/stylesheets/application.sass
+	* .scss ok too, i think.
+In app/assets/stylesheets/application.sass
+	@import "bootstrap-sprockets";
+	@import "bootstrap";
+
+	remove all the *= require_self and *= require_tree .
+	 Instead, use @import to import Sass/scss files.
+
+In app/assets/javascripts/application.js
+	//= require jquery
+	//= require jquery_ujs
+	//= require turbolinks
+	//= require bootstrap-sprockets  <== NEW
+	//= require_tree .
+
+Should work locally, but might not on Heroku.
+If not, go to: 
+config/environments/production.rb
+toggle to true
+config.assets.compile = true
+
+	(Bootstrap should be working.
+	Should see some minor layout change.
+	Still ugly, but should be working.)
+
+2. Use Bootstrap
+start off with creating nav. put it in a partial.
+
+in application.html.erb
+take your 2 links and put them in an <ul>/<li>
+
+		<ul>
+			<li> <%= link_to 'Welcome',			welcome_path %> </li>
+			<li> <%= link_to 'Articles', 		articles_path %> </li>
+		</ul>
+
+add classes and put in container
+
+<div class="container">
+	<ul class="nav navbar-nav pull-right">
+		<li> <%= link_to 'Welcome',			welcome_path %> </li>
+		<li> <%= link_to 'Articles', 		articles_path %> </li>
+	</ul>
+</div>
+
+
+then add bootstrap navbar class, and associated classes for look/feel we want
+add logo
+might as well do proper html, so use <header> and <nav>
+
+<header class="navbar navbar-static-top navbar-inverse">
+<div class="container">
+	<%= link_to "WhatUp", '/', id: "logo" %>
+		<nav>
+			<ul class="nav navbar-nav pull-right">
+				<li> <%= link_to 'Welcome',			welcome_path %> </li>
+				<li> <%= link_to 'Articles', 		articles_path %> </li>
+			</ul>
+	</nav>
+</div>
+</header>
+
+test
+
+move into partial
+in app/views create new directory shared
+go to app/views/ mkdir shared
+
+in that directory, create a new file _navigation.html.erb
+	* Note that it begins with an _ (underscore)
+		This is an important Rails convention, all *partials* need to start with an underscore _
+		this is how Rails will find the partial, so you must do this.
+
+Move (cut/paste) your Bootstrap nav code out of application.html.erb and paste it into new _navigation.html.erb file
+		<ul class="nav navbar-nav navbar-right">
+			<li> <%= link_to 'Welcome',			welcome_path %> </li>
+			<li> <%= link_to 'Articles', 		articles_path %> </li>
+		</ul>	
+
+Now, in application.html.erb, IN THE LOCATION of where that code WAS.
+	(after you cut the code, put this in its place...)
+	<%= render 'shared/navigation' %>
+
+		====
+		Alternative wording may be better:
+		This render is going to replace the code
+		about your ul/li code, put a render:
+				<%= render 'shared/navigation' %>
+
+				<ul class="nav navbar-nav navbar-right">
+					<li> <%= link_to 'Welcome',			welcome_path %> </li>
+					<li> <%= link_to 'Articles', 		articles_path %> </li>
+				</ul>
+		 ...then show cut/paste.
+
+		ultimately, you have just moved this chunk of code into the partial, and in this place told Rails where it can find the code.  
+		This is all to keep your code clean (explain premise of DRY).  everything is going to become a mess. Start getting organized now. ...put duplicate code in the one central location
+		[[[note, if this become part of a larger tutorial, make them paste it in 2 places first,
+		then see how it can be combined in one area aka a partial.]]]
+		====
+
+Test, still working?  Good! Got your partial working!	
+---
+Aside: Quickest Bootstrap tutorial ever
+On its base, Bootstrap work like this: everything breaks down pages into 12 columns.
+This is accomplished with 3 steps (3 divs)
+1. Outside div (tells Bootstrap to start doing its thing)
+	div.container
+2. create a row
+	div.row
+3. WITHIN THAT ROW, create columns in that row, must equal 12
+    div.col-xs-12
+	Therefore, if you want 2 columns, let's for example say we want a left sidebar, you could do
+	div.col-xs-3
+	div.col-xs-9
+
+ok, more broadly, everything is a bunch of bootstrap classes, and not everything is exclusively in a bootstrap columns.
+	for things like navbar, the 12 columns is unnessesray.
+	we still start everything off in a Bootstrap container div.container (which is a bootstrap class)
+		then we put the nav in the bootstrap container div.xyz
+---
+Since we want out entire app to have bootstrap, wrap the <%= yield %> entirely in a basic Bootstap structure:
+(in this case I like a type of container, container-fluid)
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-xs-12">
+				<%= yield %>
+			</div>
+		</div>
+	</div>
+---
+
+V. GENERATE USER SCAFFOLD (before Devise and/or Pundit gems)
+---------------------------------------------------------------------------------------------
+---NOTE1---: If you want entire "scaffold" generated for you, (ie, all the views, models, controllers, resourse in routes.rb file, tests, etc.) generated for you, do this before using the Devise or Pundit gem [[though now not sure if going to use Pundit, and not really an issue with Devise -- see NOTE3 below]].  
+
+The Devise gem will create a User model if it is not present.  And, it is smart enough, where if you use the Devise generator *after* a Rails scaffold is created, and will not overwrite the model, etc -- so you CAN use the Devise generator AFTER the Rails Scaffold Generator.  However, if you do "rails g devise User" first, you will *not* be able to do "rails g scaffold User" after, because the Rails scaffold generator will see a User model, and not allow you to overwrite a previously existing User model (created by Devise).
+
+---NOTE2---: You could call your User model/scaffold anything (ex: member, client, customer, etc), but in this case, it is suggested that you simply call it "User" -- Devise *is* flexible enough to work with differently named User models, but some other gems might not.
+
+---NOTE3---: Pundit assumes that the User model is called "User" (and cannot work with other named User models, ie Customer, etc) so best that you stick with User for now.  This may also be the case for other gems -- little downside using User -- even if you don't end up using Pundit. [[[Currently, thinking of skipping Pundit and simply using enum]]]
+---------------------------------------------------------------------------------------------
+
+rails g scaffold User 
+//not sure if I passed in other parameters, ie "rails g scaffold User name:string email:string" etc,
+//but the Devise generator seems to have added a bunch of columns.
+
+VI. INSTALL DEVISE
+in Gemfile:  gem 'devise'
+in terminal: 
+$ bundle install
+$ rails generate devise:install
+
+follow instructions in Terminal:
+		===============================================================================
+
+		Some setup you must do manually if you haven't yet:
+
+		  1. Ensure you have defined default url options in your environments files. Here
+			 is an example of default_url_options appropriate for a development environment
+			 in config/environments/development.rb:
+
+			   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+
+			 In production, :host should be set to the actual host of your application.
+
+		  2. Ensure you have defined root_url to *something* in your config/routes.rb.
+			 For example:
+
+			   root to: "home#index"
+
+		  3. Ensure you have flash messages in app/views/layouts/application.html.erb.
+			 For example:
+
+			   <p class="notice"><%= notice %></p>
+			   <p class="alert"><%= alert %></p>
+
+		  4. If you are deploying on Heroku with Rails 3.2 only, you may want to set:
+
+			   config.assets.initialize_on_precompile = false
+
+			 On config/application.rb forcing your application to not access the DB
+			 or load models when precompiling your assets.
+
+		  5. You can copy Devise views (for customization) to your app by running:
+
+			   rails g devise:views
+
+		===============================================================================
+1. in config/environments/development.rb:
+	config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+2. something for root of config/routes.rb 
+	ie, root to: "home#index"
+3. flash messages in app/views/layouts/application.html.erb
+	ex: <p class="notice"><%= notice %></p>
+		<p class="alert"><%= alert %></p>
+	I used fancier version which uses Bootstrap and different flash types (this needs to be edited, does not color msgs properly.)
+	------------
+	<!-- Flash message sequired by Devise, this version is fancies and uses Bootstrap -->
+	<div class="row">
+		<div class="col-xs-12">
+			<% flash.each do |name, msg| %>
+				<% if msg.is_a?(String) %>
+					<div class="alert alert-<%= name == :notice ? "success" : "danger" %> alert-dismissable">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true" >&times;</button>
+						<%= content_tag :div, msg, :id => "flash_#{name}" %>
+					</div>
+				<% end %>
+			<% end %>
+		</div>
+	</div>
+	------------
+4. Set flag if Rails 3.2 (only Rails 3.2 exactly)
+	config.assets.initialize_on_precompile = false
+	
+5. Can generate "devise views" but I prefer to run as per the Devise Readme, which is after Devise generates model.
+	Hold off until later: rails g devise:views
+
+NEXT: generate a Devise User model (this automatically create our User model).
+
+WAIT!!  ...generate User scaffold FIRST!, so that you have the rest of the scaffolding aside from the "model"
+		...Devise (and the 'rails generate devise User') will create a "User model" for us,
+		but it will see if there is a "User model" there already, and work around it.
+
+
+1. rails g devise User
+	------------
+	RESULT: [Note, runs a Rails model generator for you (??)]
+	------------
+	invoke  active_record
+	create    db/migrate/20150131003215_devise_create_users.rb
+	create    app/models/user.rb
+	invoke    test_unit
+	create      test/models/user_test.rb
+	create      test/fixtures/users.yml
+	insert    app/models/user.rb
+	route  devise_for :users
+	------------
+  rake db:migrate
+
+2. Does not add Username to migration, add it manually:
+xxxxxxxxxxxxxxxxxxxxxxx
+PROBLEM BELOW:  should NOT(?) have "new" User, should use Devise new_user [actually: new_user_registration_path] route.
+xxxxxxxxxxxxxxxxxxxxxxx
+	
+	did later, is this the solution??....
+	(should I do more/remove another controller action/delete view?)
+	------
+	def new
+		@user = User.new
+		redirect_to new_user_registration_path
+		#respond_with(@user)
+    end
+	------
+	should I do something about users/edit
+	- delete the users/new & users/edit views?
+	- change the before_action :set_user, only: ...  REMOVE :new :edit ??
+
+Answ?xxxxxxxxxxxxxxxxxx
+============
+generate devise views here?  Yes??
+rails g devise:views
+============
+Then don't have to mess with User views as much?
+xxxxxxxxxxxxxxxxxxxxxxx
+
+
+//for this part, need to create Username, setup strong parmas permit?, validation, allow for login using Username || password
+============
+Nice to have, Username as part of User model
+============
+add username to Users model
+    Use generator to do Migration (adding 'Name' string to Users table).
+    ----------------------
+    rails generate migration AddUsernameToUsers username:string
+    ----------------------
+
+run migration
+	------------
+	rake db:migrate
+	------------
+
+[x[  update views below, then come back here ]x]
+*NEXT*
+Add Validation(s) and index to username & email, using migration 
+	------------
+	rails generate migration add_index_to_users_email
+	------------
+
+[[[SHOULD DO "rails generate migration AddUsernameToUsers username:string" migration first, so don't have to go into views 2x]]]
+3. User Views, fixes (A B C)
+
+A1. first, add /users to _navigation.html.erb for convenience (new <li>):
+	--------------
+	<li> <%= link_to 'Users', users_path %> </li>
+	--------------
+
+A2. [[this happened to me, don't know why b/c "User scaffold" should have covered it]]
+go to /users.  note the views do not display email (or anything else) in the table.
+	--------------
+	<table class="table table-striped table-bordered">		<==== ADD Bootstrap classes
+	  <thead>
+		<tr>
+		  <th class="center">User id</th> 					<==== ADD
+		  <th class="center">Username</th> 					<==== ADD
+		  <th class="center">email</th>    					<==== ADD
+		  <th colspan="3"></th>
+		</tr>
+	  </thead>
+
+	  <tbody>
+		<% @users.each do |user| %>
+		  <tr>
+		    <td><%= user.id %></td>							<==== ADD
+			<td><%= user.username %></td>					<==== ADD
+		    <td><%= user.email %></td>      				<==== ADD
+		    <td><%= link_to 'Show', user %></td>
+		    <td><%= link_to 'Edit', edit_user_path(user) %></td>
+		    <td><%= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+		  </tr>
+		<% end %>
+	  </tbody>
+	</table>
+	--------------
+
+A3. same for show.html.erb (new page):
+	--------------
+	<div class="row">
+		<div class="col-xs-12">
+		<p id="notice"><%= notice %></p>
+
+		<table class="table table-striped table-bordered">
+			<tr>
+				<div class="form-group">
+					<strong>User ID</strong>
+					<%= @user.id %>
+				</div>
+				<div class="form-group">
+					<strong>email</strong>
+					<%= @user.email %>
+				</div>
+			</tr>
+		</table>
+		<%= link_to 'Edit', edit_user_path(@user) %> |
+		<%= link_to 'All Users', users_path %>
+	
+		</div>
+	</div>
+	--------------
+
+A4. same for the _form.html.erb for show/edit
+add div.rom, div.col-xs-12
+then:
+	--------------
+      <div class="form-group">
+        <%= f.label :id %>
+        <%= @user.id %>		<=== Note, can't edit/don't wnat to give ability to edit this, so it is only displaying id.
+      </div>
+      <div class="form-group">
+        <%= f.label :username %><br>
+        <%= f.text_area :username, class: "form-control"%>
+      </div>  	  
+      <div class="form-group">
+        <%= f.label :email %><br>
+        <%= f.text_area :email, class: "form-control"%>
+      </div>
+      <div class="form-group">
+        <%= f.submit "Save", class: "btn btn-success"  %>
+      </div>
+	--------------
+
+============
+generate devise views here?
+rails g devise:views
+============
+
+
+***************************SO FAR***************************
+did not add Username to User class (make sure everything is working with Strong Parameters)
+did not index email
+did not index username
+did NO validations (do from chapter 6 of hartl -- has index And validation)
+
+Make sure there are not dupicate routes from Devise & User resource
+	(Devise gives us signup_path and User resource user's new.html.erb, create, etc)
+
+------------------------------------------------------------
+Later: Use Rails 4.2 built in enum for User Authorization
+************************************************************
+
+connecting tables/User to Post Models:
+
+1. Associate Models
+	in user model:
+		has_many :articles
+	in article model:
+		belongs_to :user
+
+2. Use migration: create user_id foreign key in articles table
+	rails g migration AddUserIdToArticle user_id:integer
+	rake db:migrate
+
+3. make the foreign key, "user_id" update in articles table, via the articles controller:
+	(a) make sure you are using Devise's "user authentication" in the articles controller (set as before_action)
+		before_action :authenticate_user!
+		...this assures that the Devise helpers are available in the articles_controller
+	(b) In articles#create action, 2nd line add:
+	    @article.user_id = current_user.id  <--note, "current_user" is a Devise helper method
+		
+		Test: go to /articles/new
+		create a new article.  In the db (use pgAdminIII)  see that user_id column is populated with current user's id.
+
+
+		also test that was created in console:
+		rails c
+		User.first.articles.first
+	-----commit for reference-----
+	git commit -m "Make articles_controller add user_id to Articles table via create action:
+	[2 parts] 1. Add Devise authenticate_user! to articles_controller (makes sure you have Devise helpers).
+	2. Use Devise current_user helper to get current_user.id, and put the value in @article.user_id (hash?), 
+	which (automatically) puts it in articles table user_id column."
+	------------------------------
+
+	(c) might as well make viewable in articles#index, #show, #edit/#create
+
+    1. articles#index.html.erb
+	------------------------------
+     <tr>
+       <th class="center">Title</th>
+       <th class="center">Body</th>
++      <th class="center">User's email</th>
+       <th colspan="3"></th>
+     </tr>
+   </thead>
+
+       <tr>
+         <td><%= article.title %></td>
+         <td><%= article.body %></td>
++        <td><%= article.user.email %></td>
+         <td><%= link_to 'Show', article %></td>
+	...
+	------------------------------
+
+	2. articles#show.hmtl.erb
+	------------------------------
+                <table class="table table-striped table-bordered">
+                        <tr>
+-                               <div class="form-group">
++                               <td class="form-group">
+                                  <strong>Thttp://localhost:3000/articlesitle:</strong>
+                                  <%= @article.title %>
+-                               </div>
++                               </td>
+ 
+-                               <div class="form-group">
++                               <td class="form-group">
++                                 <strong>User Email:</strong>
++                                 <%= @article.user.email %>
++                               </td>                                           
++                       </tr>   
++               </table>
++               
++               <table class="table table-striped table-bordered">
++                       <tr>
++                               <td class="form-group">
+                                  <strong>Body:</strong>
+                                  <%= @article.body %>
+-                               </div>
++                               </td>
+                        </tr>
+                </table>
+	------------------------------
+
+	3. articles#_form.html.erb (#edit, #create)
+	------------------------------
++      <div class="form-group">
++        <!-- From  http://api.rubyonrails.org/classes/ActionView/Helpers/FormHelper.html#method-i-fields_for -->
++        <%= fields_for :user, @article.user do |u| %>
++          <%= f.label :email %> <br>
++          <%= u.text_field :email, disabled: true, class: "form-control"  %>
++        <% end %>
++      </div>    
+	------------------------------
+------------
+MORE CHANGES (mostly Devise views after this...)
+SEE views-changes.txt or views-changes-color.txt
+------------
+
+Add :username migration
+	rails g migration AddUsernameToUser username:string
+	rake db:migrate
+	heroku run rake db:migrate --app whatupdev
+
+Pepper use of :username as appropriate throughout views:
+Add :username to views throughout Users & Articles views. 
+------
+Note: Because of Devise, we can no longer add users via, user#new
+	Remember, instead, Devise automatically routes all "new" users to users#sign_up
+
+	Therefore, any strong_parameters for user controller *resource* will not nessesarily work.
+		**:username does NOT work through sign_up
+
+	Attempted to create user through sign_up.  NO ERROR, *but* DOES NOT SAVE!
+		- Tried adding a new user through 'rails c' and it worked fine.
+
+	In Devise, needed to do special Devise version of strong_parameters to get :username to add to the db.
+	In app/controller/application_controller.rb, add:
+	------------------------------
+	# Need to deal with strong_parameters for Devise.
+	#https://github.com/plataformatec/devise#strong-parameters
+	# http://stackoverflow.com/questions/17669051/rails-4-devise-users-name-is-not-added-to-database-when-new-user-created 
+	
+	before_action :configure_permitted_parameters, if: :devise_controller?
+
+	def configure_permitted_parameters
+	  devise_parameter_sanitizer.for(:sign_in) { |u| u.permit(:username, :email) }
+	  devise_parameter_sanitizer.for(:sign_up) { |u| u.permit(:username, :email, :password, :password_confirmation) }
+	  devise_parameter_sanitizer.for(:account_update) { |u| u.permit(:username, :email, :password, :password_confirmation, :current_password) }
+	end
+	------------------------------	
+
+	Now try to add :username via sign_up. WORKS!
+
+-----
+((Note: if you DELETE users, remember, that we have not yet done any validation, so no 'dependent: :destroy' means there could be remainded 'articles' without 'users' so will get an error if attempting to access them, including in articles#index.))
+
+--> Oh wait, validation should have been setup b/c of DEVISE. Double check this, but I think it is done.
+MIGHT NEED to do validation for :username, since that was added after Devise (below).  
+	See about adding validation on :username via Devise or stand-alone?
+-----
+
+Add index to :username column of User's table.
+	Speeds up search of :username in future (puts it in hash, in memory)
+	Later, want to allow users to login by email || username
+
+	Add index (indecies) to :username
+		rails g migration AddIndexToUsersUsername
+	
+		In migration file, add the following:
+		---------------
+		def change
+		  	add_index :users, :username, unique: true
+		end
+		---------------
+
+		rake db:migrate
+
+	Test for migration in 'rails c' :
+		ActiveRecord::Base.connection.index_exists?(:users, :username)
+		-> true
+	
+	push to heroku, run migration on heroku, should all work
+
+-----
+Authorization (aka user Permissions)
+	User Rails 4.2+ enom to create permissions hiarchy
+	to allow :admin, :editor, :writer, :user to access different parts of the application.
+
+http://stackoverflow.com/questions/24479839/multiple-types-of-users-on-ruby-on-rails
+
+Create a migration:
+
+$ rails generate migration AddRoleToUsers role:integer
+The migration will look like this:
+	class AddRoleToUsers < ActiveRecord::Migration
+	  def change
+		add_column :users, :role, :integer
+	  end
+	end
+
+	rake db:migrate
+	test in rails c
+
+Add code to your User model to implement the Enum:
+
+class User < ActiveRecord::Base
+  enum role: [:student, :parent, :teacher, :admin]
+  after_initialize :set_default_role, :if => :new_record?
+
+  def set_default_role
+    self.role ||= :student
+  end
+
+end
+You define the names of the roles, and if necessary, can change the names as needed (the integer values stored with each user record remain unchanged). Active Record will restrict the assignment of the attribute to a collection of predefined values, so you don’t have to add any code to restrict the names of the roles to a defined set. Best of all, enums come with a set of convenience methods that allow you to directly query the role without any extra code. For the enum attribute shown above, you can use these methods:
+
+User.roles # => {"student"=>0, "parent"=>1, "teacher"=>2, "admin"=>1} # list all roles
+user.student! # make a student user
+user.student? # => true # query if the user is a student
+user.role # => "student" # find out the user’s role
+@users = User.student # obtain an array of all users who are students
+user.role = 'foo' # ArgumentError: 'foo' is not a valid, we can’t set invalid roles
+You can use the conditionals in a controller:
+
+class UsersController < ApplicationController
+  def index
+    unless current_user.admin?
+      redirect_to :back, :alert => "Access denied."
+    end
+    @users = User.all
+  end
+end
+Or use it in a view:
+
+<% if current_user.parent? %>
+  <li><%= link_to 'Grade Reports', some_path %></li>
+<% end %>
+
+PERMISSIONS....
