@@ -1,24 +1,25 @@
-# README
+The objective of this exercise is to take EtsyDemo basics and revamp with all new features.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Please see the project on heroku : 
 
-Things you may want to cover:
+Technologies used:
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+postgrese database in production, development, and test
+latest gems
+latest bootstrap | bootstrap dropdown menues
+carrierwave
+fog
+amazon
+fiagro
+devise
+stripe
+reviews
+raty stars rating
+average rating
+admin
+validations
+permissins
+google maps
+search
+elastic search
+3rd party search
