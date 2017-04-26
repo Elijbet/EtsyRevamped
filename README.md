@@ -11,6 +11,7 @@ carrierwave
 fog
 amazon
 fiagro
+mini-magic
 devise
 stripe
 reviews
