@@ -42,3 +42,19 @@ nav .navbar-brand {
     font-size: 18px;
   }
 }
+.jumbotron {
+  border: 1px solid #f2cb3b;
+  background-image: url('butterflies.jpg');
+  background-size: 110%;
+  background-position: 20% 50%;
+  min-height: 300px;
+
+  -webkit-filter: sepia(100%);
+  
+
+  h2, h6 {
+      color: #85D225;
+      font-weight: bold;
+      text-align: right;
+   }
+}
