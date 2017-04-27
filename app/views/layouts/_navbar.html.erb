@@ -2,7 +2,7 @@
   <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <a class="navbar-brand" href="#">Navbar</a>
+  <a><%= link_to "Navbar", listings_path, class:"navbar-brand" %></a>
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
@@ -16,18 +16,34 @@
         <a class="nav-link disabled" href="#">Disabled</a>
       </li>
     </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="text" placeholder="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form>
-      <ul class="navbar-nav ml-auto">
-        <% if user_signed_in? %>
-          <li class="nav-item" ><a><%= link_to "Edit Profile", edit_user_registration_path, class:'nav-link' %></a></li>
-          <li class="nav-item" ><a><%= link_to "Sign out", destroy_user_session_path, class:'nav-link', method: :delete %></a></li>
-        <% else %>
-          <li class="nav-item" ><a><%= link_to "Sign up", new_user_registration_path, class:'nav-link' %></a></li>
-          <li class="nav-item" ><a><%= link_to "Sign in", new_user_session_path, class:'nav-link' %></a></li>
-        <% end %>
-      </ul>
+    <div class="ml-auto">
+      <div class="input-group">
+        <span input-group-addon>
+
+          <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="text" placeholder="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+          </form>
+        </span>
+        <span input-group-addon>
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle btn-space" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Account
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            
+              <% if user_signed_in? %>
+                <a><%= link_to "Edit Profile", edit_user_registration_path, class:'dropdown-item' %></a>
+                <a><%= link_to "Sign out", destroy_user_session_path, class:'dropdown-item', method: :delete %></a>
+              <% else %>
+                <a><%= link_to "Sign up", new_user_registration_path, class:'dropdown-item' %></a>
+                <a><%= link_to "Sign in", new_user_session_path, class:'dropdown-item' %></a>
+              <% end %>
+            
+            </div>
+          </div>
+        </span>
+      </div>
+    </div>
   </div>
 </nav>
