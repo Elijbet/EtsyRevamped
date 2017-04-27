@@ -86,5 +86,6 @@ Rails.application.configure do
 
   config.action_mailer.default_url_options = { host: 'https://etsyrevamped.herokuapp.com' }
 
-
+  config.serve_static_assets = true
+  
 end
