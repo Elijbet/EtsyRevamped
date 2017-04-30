@@ -34,7 +34,7 @@
             
               <% if user_signed_in? %>
                 <a><%= link_to "Edit Profile", edit_user_registration_path, class:'dropdown-item' %></a>
-                <a><%= link_to "Sign out", destroy_user_session_path, class:'dropdown-item', method: :delete %></a>
+                <a><%= link_to "Sign out", destroy_user_session_path, method: :delete, class:'dropdown-item' %></a>
               <% else %>
                 <a><%= link_to "Sign up", new_user_registration_path, class:'dropdown-item' %></a>
                 <a><%= link_to "Sign in", new_user_session_path, class:'dropdown-item' %></a>
