@@ -37,6 +37,14 @@
                   <div class="star-rating" data-score= <%= review.rating %>></div>
                   <p><%= h(review.comment).gsub(/\n/, '<br/>').html_safe %></p>
                 </td>
+                
+                  <% if user_signed_in? %>
+                    <% if (review.user == current_user) || (current_user.admin?) %>
+                      <td><%= link_to "Edit", edit_listing_review_path(@listing, review) %></td>
+                      <td><%= link_to "Delete", listing_review_path(@listing, review), method: :delete %></td>
+                    <% end %>
+                  <% end %>
+                
               </tr>
             <% end %>
         </tbody>
@@ -48,7 +56,7 @@
   </div>
 </div>
 
-<%= link_to 'Edit', edit_listing_path(@listing), class: "btn btn-link" %>
+
 <%= link_to 'Back', listings_path, class: "btn btn-link" %>
 
 <script>
@@ -60,6 +68,5 @@
         return $(this).attr('data-score');
       }
     });
-
 
 </script>

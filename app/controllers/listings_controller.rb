@@ -1,6 +1,8 @@
 class ListingsController < ApplicationController
   before_action :set_listing, only: [:show, :edit, :update, :destroy]
-
+  before_action :authenticate_user!, except: [:index, :show]
+  before_action :check_user, except: [:index, :show]
+  
   # GET /listings
   # GET /listings.json
   def index
@@ -70,6 +72,13 @@ class ListingsController < ApplicationController
   end
 
   private
+
+    def check_user
+      unless current_user.admin?
+        redirect_to root_url, alert: "Sorry, only admins can do that!"
+      end
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_listing
       @listing = Listing.find(params[:id])
