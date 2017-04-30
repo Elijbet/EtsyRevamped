@@ -1,0 +1,30 @@
+<div class ="jumbotron">
+  <h2>You're her greatest gift
+  <br>(until now)</h2>
+  <h6>Shop for Mother's Day</h6>
+</div>
+
+<h1>Listings</h1>
+
+<div class="row">
+  <% @listings.each do |listing| %>
+    <div class="col-md-3">
+      <div class="thumbnail">
+        <%= image_tag listing.image.url %>
+        <div class="caption center">
+          <h3><%= listing.name %></h3>
+          <p><%= number_to_currency(listing.price) %></p>
+          <%= link_to 'Show', listing, class: "btn btn-link" %>
+          <% if user_signed_in? && current_user.admin? %>
+            <td><%= link_to 'Edit', edit_listing_path(listing), class: "btn btn-link" %></td>
+            <td><%= link_to 'Destroy', Listing, method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-link" %></td>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<br>
+
+<%= link_to "New Listing", new_listing_path, class: "btn btn-link" %>

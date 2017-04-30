@@ -3,6 +3,7 @@ class ListingsController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
   before_action :check_user, except: [:index, :show]
   
+
   # GET /listings
   # GET /listings.json
   def index
@@ -71,6 +72,14 @@ class ListingsController < ApplicationController
     end
   end
 
+  def search
+    if params[:search].present?
+      @listings = Listing.search(params[:search])
+    else
+      @listings = Listing.all
+    end
+  end
+  
   private
 
     def check_user

@@ -1,8 +1,8 @@
 The objective of this exercise is to take EtsyDemo basics and revamp with all new features.
 
-Please see the project on heroku : 
+Please see the project on heroku : https://etsyrevamped.herokuapp.com/
 
-Technologies used:
+Features used:
 
 postgrese database in production, development, and test
 latest gems
