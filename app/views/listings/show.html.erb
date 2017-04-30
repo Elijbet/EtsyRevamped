@@ -43,11 +43,14 @@
 <%= link_to 'Back', listings_path, class: "btn btn-link" %>
 
 <script>
-  $('.star-rating').raty({
-    path: 'https://s3-us-west-1.amazonaws.com/yelpdemo-elizak/stars',
-    readOnly: true,
-    score: function() {
-      return $(this).attr('data-score');
-    }
-  });
+
+    $('.star-rating').raty({
+      path: 'https://s3-us-west-1.amazonaws.com/yelpdemo-elizak/stars',
+      readOnly: true,
+      score: function() {
+        return $(this).attr('data-score');
+      }
+    });
+
+
 </script>
