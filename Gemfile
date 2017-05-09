@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+'ruby 2.4.1'
 
 git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
@@ -40,6 +41,7 @@ gem 'figaro'
 gem 'mini_magick'
 gem 'devise'
 gem 'searchkick', '~> 2.2', '>= 2.2.1'
+gem 'stripe', '~> 2.8'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

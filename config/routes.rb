@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  resources :orders
   devise_for :users
 
   resources :listings do
@@ -7,6 +8,7 @@ Rails.application.routes.draw do
   		get 'search'
   	end
   	resources :reviews, except: [:show, :index]
+    resources :orders
   end
 
   get 'pages/about'
