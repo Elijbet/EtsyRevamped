@@ -30,9 +30,10 @@ class OrdersController < ApplicationController
     @listing = Listing.find(params[:listing_id])
     @seller = @listing.user
     
+    
     @order.listing_id = @listing.id
     @order.buyer_id = current_user.id
-    @order.seller_id = @listing.user.id
+    @order.seller_id = @seller.id
 
     respond_to do |format|
       if @order.save
