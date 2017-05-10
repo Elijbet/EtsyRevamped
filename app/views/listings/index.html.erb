@@ -14,11 +14,8 @@
         <div class="caption center">
           <h3><%= listing.name %></h3>
           <p><%= number_to_currency(listing.price) %></p>
+          <p><%= "Sold by #{listing.user.first_name} #{listing.user.last_name}" %></p>
           <%= link_to 'Show', listing, class: "btn btn-link" %>
-          <% if user_signed_in? && current_user.admin? %>
-            <td><%= link_to 'Edit', edit_listing_path(listing), class: "btn btn-link" %></td>
-            <td><%= link_to 'Destroy', Listing, method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-link" %></td>
-          <% end %>
         </div>
       </div>
     </div>

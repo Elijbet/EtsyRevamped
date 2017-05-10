@@ -32,6 +32,9 @@
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         
           <% if user_signed_in? %>
+            <a><%= link_to "Sales History", sales_path, class:'dropdown-item' %></a>
+            <a><%= link_to "Purchase History", purchases_path, class:'dropdown-item' %></a>
+            <a><%= link_to "Manage Listings", seller_path, class:'dropdown-item' %></a>
             <a><%= link_to "Edit Profile", edit_user_registration_path, class:'dropdown-item' %></a>
             <a><%= link_to "Sign out", destroy_user_session_path, method: :delete, class:'dropdown-item' %></a>
           <% else %>
