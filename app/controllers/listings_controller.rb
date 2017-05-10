@@ -5,7 +5,7 @@ class ListingsController < ApplicationController
   
 
   def seller
-    @listings = Listing.where(user: current_user).order("create_at DESC")
+    @listings = Listing.where(user: current_user).order("created_at DESC")
   end
 
   # GET /listings
