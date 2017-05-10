@@ -15,7 +15,7 @@
           <h3><%= listing.name %></h3>
           <p><%= number_to_currency(listing.price) %></p>
           <p><%= "Sold by #{listing.user.first_name} #{listing.user.last_name}" %></p>
-          <%= link_to 'Show', listing, class: "btn btn-link" %>
+          <%= link_to 'Show', listing, class: "btn btn-link", data: { turbolinks: false }  %>
         </div>
       </div>
     </div>
