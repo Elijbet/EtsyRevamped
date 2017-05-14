@@ -1,6 +1,8 @@
 The objective of this exercise is to take EtsyDemo basics and revamp with all new features.
 
 Please see the project on heroku : https://etsyrevamped.herokuapp.com/
+Login as example user Dina, password "password".
+Test card id for stripe checkout: 5105 1051 0510 5100	
 
 Features used:
 
