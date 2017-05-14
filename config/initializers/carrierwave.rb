@@ -1,9 +1,9 @@
 CarrierWave.configure do |config|
   config.fog_credentials = {
-    :provider               => 'AWS',                        
+    :provider               => 'AWS',                       
     :aws_access_key_id      => ENV["aws_access_key_id"],                        
     :aws_secret_access_key  => ENV["aws_secret_access_key"],
     :region									=> 'us-west-1'
   }
-  config.fog_directory  = Rails.configuration.stripe[:aws_secret_access_key]                    
+  config.fog_directory  = ENV["fog_directory"]                   
 end
