@@ -6,6 +6,5 @@ CarrierWave.configure do |config|
     :region									=> 'us-west-1'
   }
   config.fog_directory  = ENV["fog_directory"]       
-  Stripe.api_key = ENV["aws_secret_access_key"]
             
 end
