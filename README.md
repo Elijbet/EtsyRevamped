@@ -26,3 +26,5 @@ google maps
 search  
 elastic search  
 3rd party search  
+
+Project from https://baserails.com/courses/etsydemo
